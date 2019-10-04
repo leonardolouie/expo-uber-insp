@@ -1,0 +1,34 @@
+[
+  {
+    "layers": [
+      {
+        "srid": 4326,
+        "mun_city_psgc": "175301000",
+        "center": {
+          "lat": 9.5072301062,
+          "lng": 118.461909592
+        },
+        "geoserver_layer": "Landslide_AlluvialFanHazards:Palawan_Landslide_AlluvialFanHazards"
+      },
+      {
+        "srid": 4326,
+        "mun_city_psgc": "175101000",
+        "center": {
+          "lat": 13.4008968474,
+          "lng": 120.742870801
+        },
+        "geoserver_layer": "Landslide_AlluvialFanHazards:OccidentalMindoro_Landslide_AlluvialFanHazards"
+      },
+      {
+        "srid": 4326,
+        "mun_city_psgc": "030801000",
+        "center": {
+          "lat": 14.7179940924,
+          "lng": 120.484883199
+        },
+        "geoserver_layer": "Landslide_AlluvialFanHazards:Bataan_Landslide_AlluvialFanHazards"
+      }
+    ]
+  }
+]
+  

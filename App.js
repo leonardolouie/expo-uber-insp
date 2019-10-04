@@ -1,12 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, Platform, Button } from 'react-native';
-import  device  from './src/constants/device'
+import { StyleSheet, View, Platform, Button, Text } from 'react-native';
 import MapView from 'react-native-maps';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
-import { Marker } from 'react-native-maps';
+import Svg from 'react-native-svg';
 
+const { PROVIDER_GOOGLE } = MapView;
 class App extends React.Component {
 
   state = {
@@ -14,9 +14,10 @@ class App extends React.Component {
     latitude:null,
     longitude:null,
     errorMessage: null,
+    landslide_maps:null
   };
 
-  componentWillMount() {
+ async componentWillMount() {
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
         errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
@@ -24,9 +25,12 @@ class App extends React.Component {
     } else {
       this._getLocationAsync();
     }
+ 
   }
 
   _getLocationAsync = async () => {
+
+    
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
       this.setState({
@@ -34,20 +38,31 @@ class App extends React.Component {
       });
     }
 
+
     let location = await Location.getCurrentPositionAsync({});
     await this.setState({ location:location, longitude:location.coords.longitude, latitude:location.coords.latitude });
+    try {
+      const response = await fetch('http://noah.up.edu.ph/api/landslide_maps')
+      const posts = await response.json()
+      this.setState({landslide_maps:posts})
+    } catch (e) {
+     
+    }
+    
   };
   
 
   _handleMapRegionChange = mapRegion => {
     this.setState({ mapRegion });
   };
+
   
   render(){
   return (
       <View style={styles.container}>
         { this.state.location && <MapView 
           style={styles.map}
+          provider={PROVIDER_GOOGLE}
           onRegionChange={this._handleMapRegionChange}
           initialRegion={{
             latitude: this.state.latitude,
@@ -55,15 +70,26 @@ class App extends React.Component {
             latitudeDelta: 0.03000,
             longitudeDelta: 0.0421
           }}>
-            <Marker style={styles.marker} title="My Location" 
-            coordinate={{latitude:this.state.latitude, longitude:this.state.longitude}} />
+          
+          {this.state.landslide_maps && this.state.landslide_maps.map((value) => 
+             value.layers.map((item, index) => 
+             <MapView.Marker
+             coordinate={{latitude:item.center.lat, longitude:item.center.lng}}
+             key={index}
+             anchor={{x: 0.5, y: 0.5}}
+             > 
+                <Svg height={20} width={20}>
+                      <Svg.Circle
+                        cx="10"
+                        cy="10"
+                        r={2}
+                      />
+                </Svg>
+              </MapView.Marker>
+             )
+          )}  
         </MapView> }
-        <Button
-            onPress={this.getCurrentPositionAsync}
-            title="Back"
-            color="#841584"
-            accessibilityLabel="Learn more about this purple button"
-        />
+     
       </View>
     );
   }
